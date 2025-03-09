@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Search, Filter, Clock, Star, ChevronDown, MapPin, Navigation, Map, Locate } from "lucide-react"
 import Image from "next/image"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
