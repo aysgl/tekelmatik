@@ -1,24 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, Clock, Star, ChevronDown, MapPin, Navigation, Map, Locate } from "lucide-react"
+import { Star, MapPin, Navigation, Map, Locate, List } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Slider } from "@/components/ui/slider"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { ToggleMenu } from "@/components/combined/toggle-menu"
+import { ModeToggle } from "@/components/combined/mode-toggle"
 import Logo from "@/assets/Logo"
 
 // Example liquor store data
@@ -31,7 +20,7 @@ const liquorStores = [
         isOpen: true,
         closingTime: "24:00",
         rating: 4.7,
-        image: "/placeholder.svg?height=100&width=100",
+        image: "https://placeholder.pics/svg/300",
     },
     {
         id: 2,
@@ -75,57 +64,9 @@ const liquorStores = [
     },
 ]
 
-// Example product data
-const products = [
-    {
-        id: 1,
-        name: "Efes Pilsen",
-        category: "Beer",
-        price: 45.9,
-        image: "/placeholder.svg?height=200&width=200",
-        alcohol: "5%",
-        volume: "50cl",
-        rating: 4.2,
-    },
-    {
-        id: 2,
-        name: "Jack Daniel's",
-        category: "Whiskey",
-        price: 650.0,
-        image: "/placeholder.svg?height=200&width=200",
-        alcohol: "40%",
-        volume: "70cl",
-        rating: 4.7,
-    },
-    {
-        id: 3,
-        name: "Absolut Vodka",
-        category: "Vodka",
-        price: 450.0,
-        image: "/placeholder.svg?height=200&width=200",
-        alcohol: "40%",
-        volume: "70cl",
-        rating: 4.5,
-    },
-    {
-        id: 4,
-        name: "Tekirdag Raki",
-        category: "Raki",
-        price: 350.0,
-        image: "/placeholder.svg?height=200&width=200",
-        alcohol: "45%",
-        volume: "70cl",
-        rating: 4.6,
-    },
-]
-
 export default function LiquorSearchPage() {
     const [searchText, setSearchText] = useState("")
     const [addressSearchText, setAddressSearchText] = useState("")
-    const [priceRange, setPriceRange] = useState([0, 1000])
-    const [selectedCategory, setSelectedCategory] = useState("all")
-    const [selectedLiquorStore, setSelectedLiquorStore] = useState<number | null>(null)
-    const [onlyOpenNow, setOnlyOpenNow] = useState(true)
     const [viewMode, setViewMode] = useState<"list" | "map">("list")
     const [locationSet, setLocationSet] = useState(false)
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
@@ -153,7 +94,6 @@ export default function LiquorSearchPage() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 () => {
-                    // In a real app, you would use an API to convert coordinates to an address
                     setSelectedAddress("Your Current Location")
                     setLocationSet(true)
                     setLocationPermissionGranted(true)
@@ -171,8 +111,6 @@ export default function LiquorSearchPage() {
     // Liquor store filtering
     const filteredLiquorStores = liquorStores
         .filter((store) => {
-            if (onlyOpenNow && !store.isOpen) return false
-
             const searchMatch =
                 store.name.toLowerCase().includes(searchText.toLowerCase()) ||
                 store.address.toLowerCase().includes(searchText.toLowerCase())
@@ -180,34 +118,17 @@ export default function LiquorSearchPage() {
             return searchMatch
         })
         .sort((a, b) => {
-            // Sort open stores first, then by distance
             if (a.isOpen && !b.isOpen) return -1
             if (!a.isOpen && b.isOpen) return 1
             return a.distance - b.distance
         })
-
-    // Product filtering
-    const filteredProducts = products.filter((product) => {
-        // Search text filter
-        const searchMatch =
-            product.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchText.toLowerCase())
-
-        // Price range filter
-        const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1]
-
-        // Category filter
-        const categoryMatch = selectedCategory === "all" || product.category.toLowerCase() === selectedCategory.toLowerCase()
-
-        return searchMatch && priceMatch && categoryMatch
-    })
 
     return (
         <div className="min-h-screen bg-background">
             <header className="sticky top-0 z-10 bg-background ">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                     <Logo className="text-3xl" />
-                    <ToggleMenu />
+                    <ModeToggle />
                 </div>
             </header>
 
@@ -285,320 +206,98 @@ export default function LiquorSearchPage() {
                         </div>
                     </div>
                 ) : (
-                    // Main Application Screen (After location is set)
                     <>
-                        {/* Location Info */}
-                        <div className="flex items-center justify-between bg-muted p-3 rounded-lg mb-6">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="h-5 w-5 text-primary" />
-                                <div>
-                                    <p className="font-medium">{selectedAddress}</p>
-                                    <p className="text-xs text-muted-foreground">Delivery address</p>
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="sm" onClick={() => setLocationSet(false)}>
-                                Change
-                            </Button>
-                        </div>
-
-                        {/* Search Bar */}
-                        <div className="relative mb-6">
-                            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                type="search"
-                                placeholder="Search for liquor stores or products..."
-                                className="pl-10 py-6 text-lg"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Liquor Stores Section */}
-                        <div className="mb-8">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">Open Liquor Stores</h2>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant={viewMode === "list" ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setViewMode("list")}
-                                    >
-                                        List
-                                    </Button>
-                                    <Button
-                                        variant={viewMode === "map" ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setViewMode("map")}
-                                    >
-                                        <Map className="h-4 w-4 mr-1" />
-                                        Map
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 mb-4">
-                                <Button
-                                    variant={onlyOpenNow ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setOnlyOpenNow(true)}
-                                    className="gap-1"
-                                >
-                                    <Clock className="h-4 w-4" />
-                                    Open Now
-                                </Button>
-                                <Button
-                                    variant={!onlyOpenNow ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setOnlyOpenNow(false)}
-                                >
-                                    Show All
-                                </Button>
-                            </div>
-
-                            {viewMode === "list" ? (
-                                <div className="grid gap-4">
-                                    {filteredLiquorStores.length > 0 ? (
-                                        filteredLiquorStores.map((store) => (
-                                            <Card
-                                                key={store.id}
-                                                className={`overflow-hidden ${selectedLiquorStore === store.id ? "border-primary" : ""}`}
-                                                onClick={() => setSelectedLiquorStore(store.id)}
-                                            >
-                                                <div className="flex p-4">
-                                                    <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted mr-4 shrink-0">
-                                                        <Image
-                                                            src={store.image || "/placeholder.svg"}
-                                                            alt={store.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between">
-                                                            <h3 className="font-medium">{store.name}</h3>
-                                                            <Badge
-                                                                variant={store.isOpen ? "outline" : "secondary"}
-                                                                className={store.isOpen ? "bg-green-100 text-green-800 border-green-200" : ""}
-                                                            >
-                                                                {store.isOpen ? "Open" : "Closed"}
-                                                            </Badge>
-                                                        </div>
-                                                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                                            <MapPin className="h-3 w-3" />
-                                                            {store.address}
-                                                        </p>
-                                                        <div className="flex items-center justify-between mt-2">
-                                                            <div className="flex items-center gap-1">
-                                                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                                                <span className="text-xs">{store.rating}</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-1 text-sm">
-                                                                <Navigation className="h-3 w-3" />
-                                                                <span>{store.distance} km</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-muted px-4 py-2 flex justify-between items-center">
-                                                    {store.isOpen ? (
-                                                        <span className="text-xs text-muted-foreground">Closing: {store.closingTime}</span>
-                                                    ) : (
-                                                        <span className="text-xs text-muted-foreground">Currently Closed</span>
-                                                    )}
-                                                    <div className="flex gap-2">
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button variant="outline" size="sm">
-                                                                    Directions
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent>
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Directions</DialogTitle>
-                                                                    <DialogDescription>
-                                                                        {store.name} - {store.address}
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                                                                    <Map className="h-8 w-8 text-muted-foreground" />
-                                                                    <span className="ml-2 text-muted-foreground">Map View</span>
-                                                                </div>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                        <Button size="sm">View Products</Button>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))
-                                    ) : (
-                                        <div className="text-center py-12 border rounded-lg">
-                                            <h3 className="text-lg font-medium mb-2">No open liquor stores found</h3>
-                                            <p className="text-muted-foreground">
-                                                Please try a different search term or check the Show All option.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
-                                    <div className="text-center">
-                                        <Map className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                                        <h3 className="text-lg font-medium">Map View</h3>
-                                        <p className="text-sm text-muted-foreground">Nearby open liquor stores will be shown on the map</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Selected Liquor Store Products */}
-                        {selectedLiquorStore && (
-                            <div className="mt-8 mb-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-bold">
-                                        {liquorStores.find((t) => t.id === selectedLiquorStore)?.name} Products
-                                    </h2>
-                                    <Button variant="outline" size="sm" onClick={() => setSelectedLiquorStore(null)}>
-                                        Show All Stores
-                                    </Button>
-                                </div>
-
-                                {/* Categories */}
-                                <Tabs defaultValue="all" className="mb-6" onValueChange={setSelectedCategory}>
-                                    <TabsList className="w-full justify-start overflow-auto">
-                                        <TabsTrigger value="all">All Products</TabsTrigger>
-                                        <TabsTrigger value="beer">Beer</TabsTrigger>
-                                        <TabsTrigger value="raki">Raki</TabsTrigger>
-                                        <TabsTrigger value="whiskey">Whiskey</TabsTrigger>
-                                        <TabsTrigger value="vodka">Vodka</TabsTrigger>
-                                        <TabsTrigger value="wine">Wine</TabsTrigger>
-                                        <TabsTrigger value="gin">Gin</TabsTrigger>
-                                    </TabsList>
-                                </Tabs>
-
-                                {/* Filters and Sorting */}
-                                <div className="flex justify-between items-center mb-6">
-                                    <Sheet>
-                                        <SheetTrigger asChild>
-                                            <Button variant="outline" className="gap-2">
-                                                <Filter className="h-4 w-4" />
-                                                Filter
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent side="left">
-                                            <SheetHeader>
-                                                <SheetTitle>Filters</SheetTitle>
-                                                <SheetDescription>
-                                                    Use filters to find the product you are looking for more easily.
-                                                </SheetDescription>
-                                            </SheetHeader>
-                                            <div className="mt-6 space-y-6">
-                                                <div className="space-y-2">
-                                                    <h3 className="text-sm font-medium">Price Range</h3>
-                                                    <div className="pt-4">
-                                                        <Slider
-                                                            defaultValue={[0, 1000]}
-                                                            max={1000}
-                                                            step={10}
-                                                            value={priceRange}
-                                                            onValueChange={setPriceRange}
-                                                        />
-                                                        <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-                                                            <span>{priceRange[0]} ₺</span>
-                                                            <span>{priceRange[1]} ₺</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <h3 className="text-sm font-medium">Alcohol Percentage</h3>
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        <Button variant="outline" size="sm">
-                                                            %0-5
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            %5-20
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            %20-40
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            %40+
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <h3 className="text-sm font-medium">Volume</h3>
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        <Button variant="outline" size="sm">
-                                                            33cl
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            50cl
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            70cl
-                                                        </Button>
-                                                        <Button variant="outline" size="sm">
-                                                            100cl
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="mt-6 flex gap-2">
-                                                <Button className="flex-1">Apply</Button>
-                                                <Button variant="outline" onClick={() => setPriceRange([0, 1000])}>
-                                                    Clear
-                                                </Button>
-                                            </div>
-                                        </SheetContent>
-                                    </Sheet>
-
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-muted-foreground">Sort:</span>
-                                        <Button variant="outline" className="gap-1">
-                                            Price: Low to High
-                                            <ChevronDown className="h-4 w-4" />
+                        <Card className="bg-zinc-100 dark:bg-zinc-100/10 mb-6 border-0 shadow-none">
+                            <CardContent className="flex items-center justify-between">
+                                <p className="font-light text-2xl">{selectedAddress} <small>change</small></p>
+                                <div className="flex justify-end items-center">
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant={viewMode === "list" ? "outline" : "default"}
+                                            size="sm"
+                                            onClick={() => setViewMode("list")}
+                                        >
+                                            <List className="h-4 w-4 mr-1" />
+                                            List
+                                        </Button>
+                                        <Button
+                                            variant={viewMode === "map" ? "outline" : "default"}
+                                            size="sm"
+                                            onClick={() => setViewMode("map")}
+                                        >
+                                            <Map className="h-4 w-4 mr-1" />
+                                            Map
                                         </Button>
                                     </div>
                                 </div>
+                            </CardContent>
+                        </Card>
 
-                                {/* Product List */}
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {filteredProducts.length > 0 ? (
-                                        filteredProducts.map((product) => (
-                                            <Card key={product.id} className="overflow-hidden">
-                                                <div className="aspect-square relative bg-muted">
-                                                    <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+                        {viewMode === "list" ? (
+                            <div className="grid gap-4">
+                                {filteredLiquorStores.length > 0 ? (
+                                    filteredLiquorStores.map((store) => (
+                                        <Card
+                                            key={store.id}
+                                        >
+                                            <CardContent className="flex">
+                                                <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted mr-4 shrink-0">
+                                                    <Image
+                                                        src={store.image}
+                                                        alt={store.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
                                                 </div>
-                                                <CardContent className="p-4">
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <h3 className="font-medium line-clamp-1">{product.name}</h3>
-                                                            <p className="text-sm text-muted-foreground">{product.category}</p>
-                                                        </div>
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {product.alcohol}
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <h3 className="font-medium">{store.name}</h3>
+                                                        <Badge
+                                                            className={store.isOpen ? "bg-green-100 text-green-800 border-green-200" : "bg-red-100 text-red-800 border-red-200"}
+                                                        >
+                                                            {store.isOpen ? "Open" : "Closed"}
                                                         </Badge>
                                                     </div>
-                                                    <div className="flex items-center gap-1 mt-1">
-                                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                                        <span className="text-xs">{product.rating}</span>
-                                                        <span className="text-xs text-muted-foreground ml-auto">{product.volume}</span>
+                                                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                                                        <MapPin className="h-3 w-3" />
+                                                        {store.address}
+                                                    </p>
+                                                    <div className="flex items-center justify-between mt-2">
+                                                        <div className="flex items-center gap-1">
+                                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                                            <span className="text-xs">{store.rating}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-sm">
+                                                            <Navigation className="h-3 w-3" />
+                                                            <span>{store.distance} km</span>
+                                                        </div>
                                                     </div>
-                                                </CardContent>
-                                                <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                                                    <span className="font-bold">{product.price.toFixed(2)} ₺</span>
-                                                    <Button size="sm">Add to Cart</Button>
-                                                </CardFooter>
-                                            </Card>
-                                        ))
-                                    ) : (
-                                        <div className="col-span-full text-center py-12">
-                                            <h3 className="text-lg font-medium mb-2">No products found</h3>
-                                            <p className="text-muted-foreground">
-                                                Please try a different search term or adjust the filters.
-                                            </p>
-                                        </div>
-                                    )}
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="flex justify-between items-center">
+                                                {store.isOpen ? (
+                                                    <span className="text-xs text-muted-foreground">Closing: {store.closingTime}</span>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">Currently Closed</span>
+                                                )}
+                                            </CardFooter>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-12 border rounded-lg">
+                                        <h3 className="text-lg font-medium mb-2">No open liquor stores found</h3>
+                                        <p className="text-muted-foreground">
+                                            Please try a different search term or check the Show All option.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
+                                <div className="text-center">
+                                    <Map className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                                    <h3 className="text-lg font-medium">Map View</h3>
+                                    <p className="text-sm text-muted-foreground">Nearby open liquor stores will be shown on the map</p>
                                 </div>
                             </div>
                         )}
