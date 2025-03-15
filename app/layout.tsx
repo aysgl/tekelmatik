@@ -22,7 +22,7 @@ export default function RootLayout({
         <ThemeProviderWrapper>
           <QueryProvider>
             <Header />
-            <main className="container mx-auto px-4 py-6 min-h-[90vh]">
+            <main className="container mx-auto py-6 min-h-[90vh]">
               {children}
             </main>
             <Footer />

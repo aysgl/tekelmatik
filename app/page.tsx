@@ -9,6 +9,10 @@ import { useRouter } from "next/navigation";
 export default function HomePage() {
     const router = useRouter()
 
+    const handleSearch = (query: string) => {
+        router.push(`/${encodeURIComponent(query)}`);
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[80vh]">
             <div className="w-full max-w-[60%]">
@@ -22,7 +26,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-4">
-                    <SearchBar />
+                    <SearchBar onSearch={handleSearch} />
 
                     <div className="relative">
                         <div className="absolute max-w-[50%] mx-auto inset-0 flex items-center">
