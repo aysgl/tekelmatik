@@ -43,9 +43,9 @@ export const shopsApi = {
         return data
     },
 
-    getByQuery: async (query: string, page: number = 1) => {
+    getByQuery: async (query: string, page: number) => {
         const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.SEARCH(query), {
-            params: { page, limit: 50 }
+            params: { page, limit: 20 }
         });
         return data;
         return {
@@ -54,9 +54,9 @@ export const shopsApi = {
         }
     },
 
-    getByArea: async (area: string, page: number = 1) => {
+    getByArea: async (area: string, page: number) => {
         const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.AREA(area), {
-            params: { page, limit: 50 }
+            params: { page, limit: 20 }
         });
         return data;
         return {

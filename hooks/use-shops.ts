@@ -7,7 +7,7 @@ export function useInfiniteShops(term: string, type: 'query' | 'area') {
         queryFn: async ({ pageParam = 1 }) => {
             const response = type === 'query'
                 ? await shopsApi.getByQuery(term, Number(pageParam))
-                : await shopsApi.getByArea(term)
+                : await shopsApi.getByArea(term, Number(pageParam))
 
             return response
         },

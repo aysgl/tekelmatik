@@ -25,12 +25,14 @@ import {
 import LeafletMap from "@/components/leafleft-map";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useInView } from 'react-intersection-observer'
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function SearchPage() {
     const [viewMode, setViewMode] = useState<"list" | "map">("list")
     const { ref, inView } = useInView({
-        triggerOnce: false,
-        threshold: 1.0
+        // triggerOnce: false,
+        threshold: 0,
+        rootMargin: '100px'
     });
 
     const searchParams = useSearchParams()
@@ -96,166 +98,186 @@ export default function SearchPage() {
                 </CardContent>
             </Card>
 
-            {viewMode === "list" ? (
-                <div className="grid gap-4">
-                    {isLoading ? (
-                        Array(3).fill(0).map((_, i) => (
-                            <Card key={i}>
-                                <CardContent className="flex">
-                                    <Skeleton className="w-[90px] h-[90px] rounded-md mr-4 min-h-[90px]" />
-                                    <div className="flex-1">
-                                        <div className="flex items-center justify-between">
-                                            <Skeleton className="h-6 w-[200px]" />
-                                            <Skeleton className="h-6 w-[60px]" />
-                                        </div>
-                                        <Skeleton className="h-4 w-full mt-2" />
-                                        <div className="flex items-center justify-between mt-4">
-                                            <div className="flex gap-4">
-                                                <Skeleton className="h-4 w-[100px]" />
-                                                <Skeleton className="h-4 w-[100px]" />
-                                            </div>
-                                            <Skeleton className="h-9 w-[100px]" />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))
-                    ) : (
-                        shops?.pages.map((data, i) => (
-                            <Fragment key={i}>{
-                                data.data?.length > 0 ? data.data.map((shop) => (
-                                    <Card key={shop.id}>
+            <AnimatePresence mode="wait">
+                {viewMode === "list" ? (
+                    <motion.div
+                        key="list"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                            duration: 0.4,
+                        }}
+                    >
+                        <div className="grid gap-4">
+                            {isLoading ? (
+                                Array(3).fill(0).map((_, i) => (
+                                    <Card key={i}>
                                         <CardContent className="flex">
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <div className="relative md:w-[90px] md:h-[90px] w-[70px] h-[70px] rounded-md overflow-hidden bg-muted mr-4 shrink-0">
-                                                        {shop.main_photo_url ? (
-                                                            <Image
-                                                                src={shop.main_photo_url}
-                                                                alt={shop.name}
-                                                                fill
-                                                                className="object-cover"
-                                                                sizes="90px"
-                                                                loading="lazy"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex text-center items-center justify-center bg-accent text-[10px] p-2">
-                                                                {shop.name}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </DialogTrigger>
-                                                <DialogContent className="max-w-[100vw] md:max-w-[600px]">
-                                                    <DialogHeader>
-                                                        <DialogTitle className="text-lg font-semibold">
-                                                            {shop.name}
-                                                        </DialogTitle>
-                                                    </DialogHeader>
-                                                    <Carousel opts={{
-                                                        align: "start",
-                                                        loop: true,
-                                                    }} className="w-full h-full">
-                                                        <CarouselContent>
-                                                            {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
-                                                                <CarouselItem key={index}>
-                                                                    <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
-                                                                        <Image
-                                                                            src={photo}
-                                                                            alt={`${shop.name} - Photo ${index + 1}`}
-                                                                            fill
-                                                                            className="object-cover rounded-lg"
-                                                                            loading="lazy"
-                                                                        />
-                                                                    </AspectRatio>
-                                                                </CarouselItem>
-                                                            ))}
-                                                        </CarouselContent>
-                                                        <CarouselPrevious className="md:-ms-4 ms-8" />
-                                                        <CarouselNext className="md:-me-4 me-8" />
-                                                    </Carousel>
-                                                </DialogContent>
-                                            </Dialog>
-
+                                            <Skeleton className="w-[90px] h-[90px] rounded-md mr-4 min-h-[90px]" />
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
-                                                    <h3 className="font-medium">{shop.name}</h3>
-                                                    <Badge
-                                                        className={
-                                                            isShopOpenNow(shop.shop_hours)
-                                                                ? "bg-green-100 text-green-800 border-green-200"
-                                                                : "bg-red-100 text-red-800 border-red-200"
-                                                        }
-                                                    >
-                                                        {isShopOpenNow(shop.shop_hours) ? "Open" : "Closed"}
-                                                    </Badge>
+                                                    <Skeleton className="h-6 w-[200px]" />
+                                                    <Skeleton className="h-6 w-[60px]" />
                                                 </div>
-                                                <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                                    <MapPin className="h-3 w-3 hidden md:block" />
-                                                    {shop?.formatted_address}
-                                                </p>
-                                                <div className="flex items-center justify-between mt-2">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="flex items-center gap-1">
-                                                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                                            <span className="text-xs">{shop.rating}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-sm">
-                                                            <Navigation className="h-3 w-3" />
-                                                            <ShopDistance shop={{ location_lat: shop.location_lat, location_lng: shop.location_lng }} />
-                                                        </div>
+                                                <Skeleton className="h-4 w-full mt-2" />
+                                                <div className="flex items-center justify-between mt-4">
+                                                    <div className="flex gap-4">
+                                                        <Skeleton className="h-4 w-[100px]" />
+                                                        <Skeleton className="h-4 w-[100px]" />
                                                     </div>
-                                                    {shop.formatted_phone_number && (
-                                                        <Button asChild size="sm">
-                                                            <a
-                                                                href={`tel:${shop.formatted_phone_number}`}
-                                                                className="items-center gap-2"
-                                                            >
-                                                                <Phone className="h-4 w-4 md:flex hidden" />
-                                                                <span>{shop.formatted_phone_number}</span>
-                                                            </a>
-                                                        </Button>
-                                                    )}
+                                                    <Skeleton className="h-9 w-[100px]" />
                                                 </div>
                                             </div>
                                         </CardContent>
                                     </Card>
-                                )) :
-                                    <EmptyData />
-                            }
-                            </Fragment>
-                        ))
-                    )}
-                    <div ref={ref}>
-                        {isFetchingNextPage && <Card>
-                            <CardContent className="flex">
-                                <Skeleton className="w-[90px] h-[90px] rounded-md mr-4 min-h-[90px]" />
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <Skeleton className="h-6 w-[200px]" />
-                                        <Skeleton className="h-6 w-[60px]" />
-                                    </div>
-                                    <Skeleton className="h-4 w-full mt-2" />
-                                    <div className="flex items-center justify-between mt-4">
-                                        <div className="flex gap-4">
-                                            <Skeleton className="h-4 w-[100px]" />
-                                            <Skeleton className="h-4 w-[100px]" />
+                                ))
+                            ) : (
+                                shops?.pages.map((data, i) => (
+                                    <Fragment key={i}>{
+                                        data.data?.length > 0 ? data.data.map((shop) => (
+                                            <Card key={shop.id}>
+                                                <CardContent className="flex">
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <div className="relative md:w-[90px] md:h-[90px] w-[70px] h-[70px] rounded-md overflow-hidden bg-muted mr-4 shrink-0">
+                                                                {shop.main_photo_url ? (
+                                                                    <Image
+                                                                        src={shop.main_photo_url}
+                                                                        alt={shop.name}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                        sizes="90px"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex text-center items-center justify-center bg-accent text-[10px] p-2">
+                                                                        {shop.name}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="max-w-[100vw] md:max-w-[600px]">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="text-lg font-semibold">
+                                                                    {shop.name}
+                                                                </DialogTitle>
+                                                            </DialogHeader>
+                                                            <Carousel opts={{
+                                                                align: "start",
+                                                                loop: true,
+                                                            }} className="w-full h-full">
+                                                                <CarouselContent>
+                                                                    {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
+                                                                        <CarouselItem key={index}>
+                                                                            <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
+                                                                                <Image
+                                                                                    src={photo}
+                                                                                    alt={`${shop.name} - Photo ${index + 1}`}
+                                                                                    fill
+                                                                                    className="object-cover rounded-lg"
+                                                                                    loading="lazy"
+                                                                                />
+                                                                            </AspectRatio>
+                                                                        </CarouselItem>
+                                                                    ))}
+                                                                </CarouselContent>
+                                                                <CarouselPrevious className="md:-ms-4 ms-8" />
+                                                                <CarouselNext className="md:-me-4 me-8" />
+                                                            </Carousel>
+                                                        </DialogContent>
+                                                    </Dialog>
+
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center justify-between">
+                                                            <h3 className="font-medium">{shop.name}</h3>
+                                                            <Badge
+                                                                className={
+                                                                    isShopOpenNow(shop.shop_hours)
+                                                                        ? "bg-green-100 text-green-800 border-green-200"
+                                                                        : "bg-red-100 text-red-800 border-red-200"
+                                                                }
+                                                            >
+                                                                {isShopOpenNow(shop.shop_hours) ? "Open" : "Closed"}
+                                                            </Badge>
+                                                        </div>
+                                                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                                                            <MapPin className="h-3 w-3 hidden md:block" />
+                                                            {shop?.formatted_address}
+                                                        </p>
+                                                        <div className="flex items-center justify-between mt-2">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                                                    <span className="text-xs">{shop.rating}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-1 text-sm">
+                                                                    <Navigation className="h-3 w-3" />
+                                                                    <ShopDistance shop={{ location_lat: shop.location_lat, location_lng: shop.location_lng }} />
+                                                                </div>
+                                                            </div>
+                                                            {shop.formatted_phone_number && (
+                                                                <Button asChild size="sm">
+                                                                    <a
+                                                                        href={`tel:${shop.formatted_phone_number}`}
+                                                                        className="items-center gap-2"
+                                                                    >
+                                                                        <Phone className="h-4 w-4 md:flex hidden" />
+                                                                        <span>{shop.formatted_phone_number}</span>
+                                                                    </a>
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        )) :
+                                            <EmptyData />
+                                    }
+                                    </Fragment>
+                                ))
+                            )}
+                            <div ref={ref}>
+                                {isFetchingNextPage && <Card>
+                                    <CardContent className="flex">
+                                        <Skeleton className="w-[90px] h-[90px] rounded-md mr-4 min-h-[90px]" />
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <Skeleton className="h-6 w-[200px]" />
+                                                <Skeleton className="h-6 w-[60px]" />
+                                            </div>
+                                            <Skeleton className="h-4 w-full mt-2" />
+                                            <div className="flex items-center justify-between mt-4">
+                                                <div className="flex gap-4">
+                                                    <Skeleton className="h-4 w-[100px]" />
+                                                    <Skeleton className="h-4 w-[100px]" />
+                                                </div>
+                                                <Skeleton className="h-9 w-[100px]" />
+                                            </div>
                                         </div>
-                                        <Skeleton className="h-9 w-[100px]" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>}
-                    </div>
-                </div>
-            ) : (
-                <div className="rounded">
-                    <Card className="bg-muted w-full py-0">
-                        <CardContent className="h-full p-0 overflow-hidden">
-                            <LeafletMap center={mapCenter} data={shops?.pages.flatMap(page => page?.data) ?? []} />
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+                                    </CardContent>
+                                </Card>}
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="map"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                            duration: 0.4,
+                        }}
+                    >
+                        <div className="rounded">
+                            <Card className="bg-muted w-full py-0">
+                                <CardContent className="h-full p-0 overflow-hidden">
+                                    <LeafletMap center={mapCenter} data={shops?.pages.flatMap(page => page?.data) ?? []} />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
