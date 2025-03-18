@@ -38,7 +38,11 @@ export default function LeafletMap({ center, data }: LeafletMapProps) {
         import('leaflet').then(leaflet => setL(leaflet));
     }, []);
 
-    if (!L) return <div>Loading map...</div>;
+    if (!L || !data?.length) return (
+        <div className="h-[500px] w-full rounded bg-muted flex items-center justify-center">
+            {!L ? 'Loading map...' : 'No locations found'}
+        </div>
+    )
 
     const customIcon = L.divIcon({
         html: renderToString(
@@ -52,9 +56,10 @@ export default function LeafletMap({ center, data }: LeafletMapProps) {
     return (
         <MapContainer className="h-[500px] w-full rounded -z-[0]" center={center} zoom={14} scrollWheelZoom={false}>
             <TileLayer url="https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}" />
-            {data.map(shop => (
-                <Marker key={shop.id} position={[shop.location_lat, shop.location_lng]} icon={customIcon}>
-                    <Popup>{shop.name}</Popup>
+            {data.map((shop, i) => (
+                shop?.location_lat && shop?.location_lng &&
+                <Marker key={i} position={[shop?.location_lat, shop?.location_lng]} icon={customIcon}>
+                    <Popup>{shop?.name}</Popup>
                 </Marker>
             ))}
             <ResizeMap />

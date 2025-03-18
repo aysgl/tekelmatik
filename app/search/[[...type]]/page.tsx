@@ -58,7 +58,7 @@ export default function SearchPage() {
 
 
     const mapCenter = useMemo<[number, number]>(() => {
-        if (!shops?.pages?.length) return [41.015137, 28.979530];
+        if (!shops?.pages[0]?.data?.length) return [41.015137, 28.979530];
         const allLocations = shops.pages.flatMap(page => page.data);
         return [
             allLocations.reduce((sum, loc) => sum + loc.location_lat, 0) / allLocations.length,
@@ -252,7 +252,7 @@ export default function SearchPage() {
                 <div className="rounded">
                     <Card className="bg-muted w-full py-0">
                         <CardContent className="h-full p-0 overflow-hidden">
-                            <LeafletMap center={mapCenter} data={shops?.pages.flatMap(page => page.data) ?? []} />
+                            <LeafletMap center={mapCenter} data={shops?.pages.flatMap(page => page?.data) ?? []} />
                         </CardContent>
                     </Card>
                 </div>
