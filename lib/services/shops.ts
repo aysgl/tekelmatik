@@ -10,11 +10,6 @@ export interface ShopHour {
 export interface ShopType {
     type: string;
 }
-
-export interface ShopPhoto {
-    photo_url: string;
-}
-
 export interface Shop {
     id: number
     name: string
@@ -27,7 +22,7 @@ export interface Shop {
     formatted_phone_number: string
     shop_hours: ShopHour[]
     shop_types: ShopType[]
-    shop_photos: ShopPhoto[]
+    shop_photos: string[]
 }
 
 export interface Meta {

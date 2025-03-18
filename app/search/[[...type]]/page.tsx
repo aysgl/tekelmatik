@@ -26,12 +26,11 @@ import LeafletMap from "@/components/leafleft-map";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useInView } from 'react-intersection-observer'
 
-
 export default function SearchPage() {
     const [viewMode, setViewMode] = useState<"list" | "map">("list")
     const { ref, inView } = useInView({
-        triggerOnce: false,  // İlk görünümde değil her seferinde tetiklesin
-        threshold: 1.0 // Tüm öğe görünür olduğunda tetiklensin
+        triggerOnce: false,
+        threshold: 1.0
     });
 
     const searchParams = useSearchParams()
@@ -146,34 +145,34 @@ export default function SearchPage() {
                                                         )}
                                                     </div>
                                                 </DialogTrigger>
-                                                <DialogContent className="max-w-[100vw] md:max-w-[600px] h-[80vh]">
+                                                <DialogContent className="max-w-[100vw] md:max-w-[600px]">
                                                     <DialogHeader>
                                                         <DialogTitle className="text-lg font-semibold">
                                                             {shop.name}
                                                         </DialogTitle>
                                                     </DialogHeader>
-                                                    <div className="h-[calc(100%-60px)]">
-                                                        <Carousel className="w-full h-full">
-                                                            <CarouselContent>
-                                                                {shop.shop_photos?.map((photo, index) => (
-                                                                    <CarouselItem key={index} className="h-full">
-                                                                        <AspectRatio ratio={1} className="bg-muted">
-                                                                            <Image
-                                                                                src={photo.photo_url}
-                                                                                alt={`${shop.name} - Photo ${index + 1}`}
-                                                                                fill
-                                                                                className="object-cover"
-                                                                                sizes="480px"
-                                                                                loading={index === 0 ? "eager" : "lazy"}
-                                                                            />
-                                                                        </AspectRatio>
-                                                                    </CarouselItem>
-                                                                ))}
-                                                            </CarouselContent>
-                                                            <CarouselPrevious />
-                                                            <CarouselNext />
-                                                        </Carousel>
-                                                    </div>
+                                                    <Carousel opts={{
+                                                        align: "start",
+                                                        loop: true,
+                                                    }} className="w-full h-full">
+                                                        <CarouselContent>
+                                                            {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
+                                                                <CarouselItem key={index}>
+                                                                    <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
+                                                                        <Image
+                                                                            src={photo}
+                                                                            alt={`${shop.name} - Photo ${index + 1}`}
+                                                                            fill
+                                                                            className="object-cover rounded-lg"
+                                                                            loading="lazy"
+                                                                        />
+                                                                    </AspectRatio>
+                                                                </CarouselItem>
+                                                            ))}
+                                                        </CarouselContent>
+                                                        <CarouselPrevious className="md:-ms-4 ms-8" />
+                                                        <CarouselNext className="md:-me-4 me-8" />
+                                                    </Carousel>
                                                 </DialogContent>
                                             </Dialog>
 

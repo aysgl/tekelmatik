@@ -22,17 +22,18 @@ export function Header() {
 
     return (
         <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
-            <div className="container mx-auto flex justify-between items-center py-4">
-                <Link href="/" className='w-1/4'>
-                    <LogoType className="text-2xl" />
+            <div className={`container mx-auto grid ${isHomePage ? 'grid-cols-2' : 'grid-cols-3'} justify-between items-center py-4`}>
+                <Link href="/">
+                    <LogoType className="text-2xl text-nowrap" />
                 </Link>
 
                 {!isHomePage && (
-                    <div className='w-1/4 order-2 lg:order-none pt-2 md:pt-0'>
+                    <div className="md:col-span-1 col-span-3 order-2 md:order-none pt-2 md:pt-0">
                         <SearchBar onSearch={handleSearch} small />
                     </div>
                 )}
-                <div className='w-1/4 flex justify-end'>
+
+                <div className={`flex justify-end ${isHomePage ? 'col-span-1' : 'md:col-span-1 col-span-2'}`}>
                     <ModeToggle />
                 </div>
             </div>
