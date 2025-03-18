@@ -63,6 +63,14 @@ export const shopsApi = {
             ...data,
             data: data.data.filter(shop => isShopOpenNow(shop.shop_hours))
         }
+    },
+
+    getByLocation: async ({ lat, lng }: { lat: number; lng: number }) => {
+        const { data } = await api.get<ShopsResponse>(
+            API_CONFIG.ENDPOINTS.LOCATION(`${lat},${lng}`)
+        )
+        console.log("getByLocation", data);
+        return data
     }
 }
 
