@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Locate } from "lucide-react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useGeolocation } from "@/hooks/use-geolocation"
 import { cn } from "@/lib/utils"
@@ -16,40 +16,36 @@ interface SearchBarProps {
 export function SearchBar({ onSearch, small }: SearchBarProps) {
     const [search, setSearch] = useState("")
     const router = useRouter()
-    const { latitude, longitude, error } = useGeolocation();
+    const { latitude, longitude } = useGeolocation();
 
-    const handleSearch = () => {
+    const handleSearch = useCallback(() => {
         if (search) {
             onSearch?.(search)
-            router.push(`/${search}`)
+            router.push(`/search?q=${search}`)
         }
-    }
+    }, [search, onSearch, router])
 
-    const useCurrentLocation = () => {
+    const useCurrentLocation = useCallback(() => {
         if (latitude && longitude) {
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`) // ns api hazırlanacak merve 
                 .then(res => res.json())
                 .then(data => {
-                    const district = (data.address.suburb || data.address.district || data.address.neighbourhood || '')
+                    const district = data.address.suburb?.split(' ')[0]
                     if (district) {
-                        router.push(`/${encodeURIComponent(district)}`);
+                        router.push(`/search?q=${district}`)
                     }
                 })
                 .catch(() => {
-                    alert("Could not determine location name");
-                });
-        } else if (error) {
-            alert(error);
-        } else {
-            alert("Waiting for location...");
+                    alert("Could not determine location name")
+                })
         }
-    };
+    }, [latitude, longitude, router])
 
     return (
         <div className="relative">
             <Input
                 type="text"
-                placeholder="Enter your address..."
+                placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={cn(

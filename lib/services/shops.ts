@@ -7,17 +7,27 @@ export interface ShopHour {
     close_time: string;
 }
 
+export interface ShopType {
+    type: string;
+}
+
+export interface ShopPhoto {
+    photo_url: string;
+}
+
 export interface Shop {
     id: number
     name: string
     formatted_address: string
+    main_photo_url: string
     location_lat: number
     location_lng: number
     closingTime: string
     rating: number
-    photo_url: string
-    phone: string
-    shop_hours: ShopHour[];
+    formatted_phone_number: string
+    shop_hours: ShopHour[]
+    shop_types: ShopType[]
+    shop_photos: ShopPhoto[]
 }
 
 export interface Meta {
@@ -29,7 +39,7 @@ export interface Meta {
 
 export interface ShopsResponse {
     data: Shop[]
-    meta: Meta[]
+    meta: Meta
 }
 
 export const shopsApi = {
@@ -38,15 +48,27 @@ export const shopsApi = {
         return data
     },
 
-    getByQuery: async (query: string) => {
-        const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.SEARCH, {
-            params: { q: query, limit: 50 }
-        })
+    getByQuery: async (query: string, page: number = 1) => {
+        const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.SEARCH(query), {
+            params: { page, limit: 50 }
+        });
+        return data;
         return {
             ...data,
             data: data.data.filter(shop => isShopOpenNow(shop.shop_hours))
         }
     },
+
+    getByArea: async (area: string, page: number = 1) => {
+        const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.AREA(area), {
+            params: { page, limit: 50 }
+        });
+        return data;
+        return {
+            ...data,
+            data: data.data.filter(shop => isShopOpenNow(shop.shop_hours))
+        }
+    }
 }
 
 export const isShopOpenNow = (shop_hours: ShopHour[]): boolean => {
@@ -55,21 +77,24 @@ export const isShopOpenNow = (shop_hours: ShopHour[]): boolean => {
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
     const currentTime = currentHour * 60 + currentMinute;
-    const todayHours = shop_hours.find((hours) => hours.day === currentDay);
+
+    const todayHours = shop_hours && shop_hours.find((hours) => hours.day == currentDay);
 
     if (!todayHours) {
         return false;
     }
 
-    const openTime = parseInt(todayHours.open_time.slice(0, 2)) * 60 + parseInt(todayHours.open_time.slice(2));
-    const closeTime = parseInt(todayHours.close_time.slice(0, 2)) * 60 + parseInt(todayHours.close_time.slice(2));
+    const openTime = parseInt(todayHours.open_time.slice(0, 2)) * 60 +
+        parseInt(todayHours.open_time.slice(2));
+    const closeTime = parseInt(todayHours.close_time.slice(0, 2)) * 60 +
+        parseInt(todayHours.close_time.slice(2));
 
     const isOpen = closeTime < openTime
-        ? currentTime >= openTime || currentTime < closeTime
-        : currentTime >= openTime && currentTime < closeTime;
+        ? currentTime >= openTime || currentTime <= closeTime
+        : currentTime >= openTime && currentTime <= closeTime;
 
     return isOpen;
-};
+}
 
 
 export const calculateDistance = (

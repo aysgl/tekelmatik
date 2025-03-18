@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Wine } from 'lucide-react';
+import { Beer } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 import 'leaflet/dist/leaflet.css';
 import { useMap } from 'react-leaflet';
@@ -42,7 +42,7 @@ export default function LeafletMap({ center, data }: LeafletMapProps) {
 
     const customIcon = L.divIcon({
         html: renderToString(
-            <LeafleftMarker color="black" size={60} icon={<Wine color="white" />} />
+            <LeafleftMarker color="black" size={60} icon={<Beer color="white" />} />
         ),
         className: 'custom-marker-icon',
         iconSize: [24, 24],
@@ -50,7 +50,7 @@ export default function LeafletMap({ center, data }: LeafletMapProps) {
     });
 
     return (
-        <MapContainer className="h-[500px] w-full rounded" center={center} zoom={14} scrollWheelZoom={false}>
+        <MapContainer className="h-[500px] w-full rounded -z-[0]" center={center} zoom={14} scrollWheelZoom={false}>
             <TileLayer url="https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}" />
             {data.map(shop => (
                 <Marker key={shop.id} position={[shop.location_lat, shop.location_lng]} icon={customIcon}>

@@ -1,17 +1,22 @@
-import { useQuery } from '@tanstack/react-query'
-import { shopsApi } from '@/lib/services/shops'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { shopsApi, ShopsResponse } from '@/lib/services/shops'
 
-export function useShops() {
-    return useQuery({
-        queryKey: ['shops'],
-        queryFn: () => shopsApi.getShops()
-    })
-}
+export function useInfiniteShops(term: string, type: 'query' | 'area') {
+    return useInfiniteQuery<ShopsResponse>({
+        queryKey: ['shops', type, term],
+        queryFn: async ({ pageParam = 1 }) => {
+            const response = type === 'query'
+                ? await shopsApi.getByQuery(term, Number(pageParam))
+                : await shopsApi.getByArea(term)
 
-export function useShopsByQuery(query: string) {
-    return useQuery({
-        queryKey: ['shops', 'search', query],
-        queryFn: () => shopsApi.getByQuery(query),
-        enabled: !!query
+            return response
+        },
+        getNextPageParam: (lastPage) => {
+            if (!lastPage?.meta) return undefined;
+            return lastPage.meta.page < lastPage.meta.total_pages
+                ? lastPage.meta.page + 1
+                : undefined;
+        },
+        initialPageParam: 1
     })
 }

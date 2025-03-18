@@ -4,12 +4,18 @@ import ThemeProviderWrapper from "@/components/providers/theme-provider"
 import "./globals.css"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-
+import { Inter as FontSans } from "next/font/google"
 
 export const metadata: Metadata = {
   title: "Tekelmatik",
   description: "Find nearby liquor stores"
 }
+
+export const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 export default function RootLayout({
   children,

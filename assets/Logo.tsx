@@ -6,18 +6,20 @@ import { Neonderthaw } from 'next/font/google'
 
 const lemon = Neonderthaw({ subsets: ["latin"], weight: "400" })
 
-function cn(...classes: string[]) {
-    return classes.filter(Boolean).join(" ")
+function cn(...classes: (string | { [key: string]: boolean })[]) {
+    return classes
+        .flatMap((cls) => typeof cls === 'string' ? cls : Object.entries(cls).filter(([, value]) => value).map(([key]) => key))
+        .filter(Boolean)
+        .join(" ")
 }
 
 const icons = [Beer, Wine, Martini, Wheat, CupSoda]
 
 interface LogoProps {
     className?: string;
-    showIcons?: boolean;
 }
 
-export default function Logo({ className = "", showIcons = false }: LogoProps) {
+export default function Logo({ className = '' }: LogoProps) {
     const [activeIndex, setActiveIndex] = useState(0)
     const [prevIndex, setPrevIndex] = useState<number | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
@@ -48,66 +50,65 @@ export default function Logo({ className = "", showIcons = false }: LogoProps) {
     }
 
     return (
-        <div className="flex flex-col items-center">
-            {showIcons && (
-                <div className="relative h-16 w-16 flex items-center justify-center">
-                    <div
-                        className={cn(
-                            "absolute inset-0 bg-primary/10 rounded-full transition-all duration-[1000ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)]",
-                            isTransitioning ? "opacity-50 scale-110 blur-sm" : "opacity-0 scale-100 blur-0"
-                        )}
-                    />
+        <div className={cn(
+            "flex flex-col items-center",
+            className
+        )}>
 
-                    {PrevIcon && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <PrevIcon
-                                size={58}
-                                strokeWidth={.5}
-                                color={iconColors[PrevIcon.displayName as keyof typeof iconColors]}
-                                className={cn(
-                                    "text-primary transition-all duration-[1000ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)]",
-                                    isTransitioning
-                                        ? "opacity-0 translate-y-[20px] blur-sm"
-                                        : "opacity-100 translate-y-0 blur-0"
-                                )}
-                            />
-                        </div>
+            <div className="relative h-16 w-16 flex items-center justify-center">
+                <div
+                    className={cn(
+                        "absolute inset-0 bg-primary/10 rounded-full transition-all duration-[1000ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)]",
+                        isTransitioning ? "opacity-50 scale-110 blur-sm" : "opacity-0 scale-100 blur-0"
                     )}
+                />
 
+                {PrevIcon && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <CurrentIcon
+                        <PrevIcon
                             size={58}
                             strokeWidth={.5}
-                            color={iconColors[CurrentIcon.displayName as keyof typeof iconColors]}
+                            color={iconColors[PrevIcon.displayName as keyof typeof iconColors]}
                             className={cn(
                                 "text-primary transition-all duration-[1000ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)]",
                                 isTransitioning
-                                    ? "opacity-100 translate-y-0 blur-0"
-                                    : "opacity-0 translate-y-[-20px] blur-sm"
+                                    ? "opacity-0 translate-y-[20px] blur-sm"
+                                    : "opacity-100 translate-y-0 blur-0"
                             )}
                         />
                     </div>
-                </div>
-            )}
+                )}
 
-            <h1 className={cn(
-                "relative",
-                lemon.className,
-                className)}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <CurrentIcon
+                        size={58}
+                        strokeWidth={.5}
+                        color={iconColors[CurrentIcon.displayName as keyof typeof iconColors]}
+                        className={cn(
+                            "text-primary transition-all duration-[1000ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)]",
+                            isTransitioning
+                                ? "opacity-100 translate-y-0 blur-0"
+                                : "opacity-0 translate-y-[-20px] blur-sm"
+                        )}
+                    />
+                </div>
+            </div>
+
+
+            <h1 className={cn("relative", lemon.className, className)}>
                 <span
-                    className={cn(
-                        showIcons ? "bg-clip-text text-transparent bg-gradient-to-r transition-all duration-[1000ms]" : ""
-                    )}
-                    style={showIcons ? {
+                    className="bg-clip-text text-transparent transition-all duration-[1000ms]"
+                    style={{
                         backgroundImage: `linear-gradient(to right, 
                             ${iconColors[CurrentIcon.displayName as keyof typeof iconColors]}, 
-                            ${iconColors[PrevIcon?.displayName as keyof typeof iconColors] || iconColors[CurrentIcon.displayName as keyof typeof iconColors]}
+                            ${iconColors[PrevIcon?.displayName as keyof typeof iconColors] ||
+                            iconColors[CurrentIcon.displayName as keyof typeof iconColors]}
                         )`
-                    } : undefined}
+                    }}
                 >
                     Liquor Store
                 </span>
             </h1>
-        </div>
+        </div >
     )
 }

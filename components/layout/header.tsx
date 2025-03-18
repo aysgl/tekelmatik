@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import Logo from '@/assets/Logo';
 import { useRouter } from 'next/navigation';
 import { SearchBar } from '../search-bar';
 import Link from 'next/link';
 import { ModeToggle } from '../combined/mode-toggle';
+import LogoType from '@/assets/LogoType';
 
 export function Header() {
     const router = useRouter();
@@ -20,17 +20,20 @@ export function Header() {
     };
 
     return (
-        <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container mx-auto flex justify-between items-center py-4">
+        <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
+            <div className="container mx-auto grid md:grid-cols-3 grid-cols-2 justify-between items-center py-4">
                 <Link href="/">
-                    <Logo className="text-2xl" showIcons={false} />
+                    <LogoType className="text-2xl" />
                 </Link>
 
                 {!isHomePage && (
-                    <SearchBar onSearch={handleSearch} small />
+                    <div className='col-span-3 md:col-span-1 order-2 lg:order-none pt-2 md:pt-0'>
+                        <SearchBar onSearch={handleSearch} small />
+                    </div>
                 )}
-
-                <ModeToggle />
+                <div className='flex justify-end'>
+                    <ModeToggle />
+                </div>
             </div>
         </header>
     );

@@ -10,13 +10,21 @@ export default function HomePage() {
     const router = useRouter()
 
     const handleSearch = (query: string) => {
-        router.push(`/${encodeURIComponent(query)}`);
+        router.push(`/search?q=${encodeURIComponent(query)}`)
     }
 
+    const popularAddresses = [
+        { id: 1, name: 'Istanbul' },
+        { id: 2, name: 'Kadikoy' },
+        { id: 3, name: 'Besiktas' },
+        { id: 4, name: 'Taksim' },
+        { id: 5, name: 'Sisli' }
+    ]
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh]">
-            <div className="w-full max-w-[60%]">
-                <Logo showIcons={true} className="text-6xl mb-6" />
+        <div className="flex flex-col md:items-center justify-center min-h-[80vh] p-4">
+            <div className="w-full md:max-w-[60%] max-w-full">
+                <Logo className="text-6xl mb-6" />
 
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-thin mb-2">Set Your Location</h2>
@@ -38,47 +46,18 @@ export default function HomePage() {
                     </div>
 
                     {/* Popular Addresses */}
-                    <div className="flex justify-center gap-2">
-                        <Button
-                            variant="outline"
-                            className="justify-start"
-                            onClick={() => router.push(`/Kadikoy`)}
-                        >
-                            <MapPin />
-                            Kadikoy
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="justify-start"
-                            onClick={() => router.push(`Besiktas`)}
-                        >
-                            <MapPin />
-                            Besiktas
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="justify-start"
-                            onClick={() => router.push(`/Sisli`)}
-                        >
-                            <MapPin />
-                            Sisli
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="justify-start"
-                            onClick={() => router.push(`/Beyoglu`)}
-                        >
-                            <MapPin />
-                            Beyoglu
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="justify-start"
-                            onClick={() => router.push(`/Atasehir`)}
-                        >
-                            <MapPin />
-                            Atasehir
-                        </Button>
+                    <div className="flex flex-wrap justify-center gap-2">
+                        {popularAddresses.map((address) => (
+                            <Button
+                                key={address.id}
+                                variant="outline"
+                                className="flex items-center gap-2"
+                                onClick={() => router.push(`/search/${address.name.toLowerCase()}`)}
+                            >
+                                <MapPin className="h-4 w-4" />
+                                {address.name}
+                            </Button>
+                        ))}
                     </div>
                 </div>
             </div>

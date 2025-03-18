@@ -12,7 +12,7 @@ export function ShopDistance({ shop }: { shop: { location_lat: number; location_
         : null;
 
     return (
-        <span>
+        <span className="text-xs">
             {error ? "Konum alınamadı" : distance === null ? "Konum alınıyor..." : distance}
         </span>
     );
