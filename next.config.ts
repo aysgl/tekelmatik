@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif']
   },
 
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config) => {
     config.optimization.splitChunks.maxInitialRequests = Infinity;
     config.optimization.splitChunks.cacheGroups = {
       defaultVendors: {
@@ -82,13 +82,6 @@ const nextConfig: NextConfig = {
         }
       }
     };
-
-    if (!dev && !isServer) {
-      config.externals = {
-        react: 'React',
-        'react-dom': 'ReactDOM'
-      };
-    }
 
     return config;
   }
