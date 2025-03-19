@@ -1,26 +1,28 @@
 import type React from "react"
 import Link from "next/link"
-import { Separator } from "../ui/separator"
 
 export function Footer() {
     return (
-        <footer className="container mx-auto py-4">
-            <Separator className="my-4" />
-            <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-                <p className="text-sm text-muted-foreground">{new Date().getFullYear()} Tekelmatik ©  Tüm hakları saklıdır.</p>
-                <div className="flex gap-4 text-sm text-muted-foreground">
-                    <Link href="#" className="hover:text-foreground">
+        <footer className="h-[80px] w-full">
+            <div className="container mx-auto flex flex-col md:flex-row items-center justify-between py-4 md:py-0">
+                <div className="text-sm text-muted-foreground flex-shrink-0">
+                    {typeof window !== "undefined" ? new Date().getFullYear() : ""} Tekelmatik © Tüm hakları saklıdır.
+                </div>
+                <nav className="flex gap-4 text-sm text-muted-foreground">
+                    <Link
+                        href="#"
+                        className="transition-colors hover:text-foreground"
+                    >
                         Gizlilik
                     </Link>
-                    <Link href="#" className="hover:text-foreground">
-                        Şartlar
-                    </Link>
-                    <Link href="#" className="hover:text-foreground">
+                    <Link
+                        href="#"
+                        className="transition-colors hover:text-foreground"
+                    >
                         İletişim
                     </Link>
-                </div>
+                </nav>
             </div>
         </footer>
     )
 }
-

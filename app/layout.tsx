@@ -1,10 +1,10 @@
 import { Metadata } from "next"
 import QueryProvider from '@/components/providers/query-provider'
 import ThemeProviderWrapper from "@/components/providers/theme-provider"
-import "./globals.css"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Inter as FontSans } from "next/font/google"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Tekelmatik",
@@ -24,11 +24,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <head>
+        <link
+          rel="preload"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          as="style"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://maps.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://maps.googleapis.com"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+      </head>
+      <body className="flex min-h-screen flex-col">
         <ThemeProviderWrapper>
           <QueryProvider>
             <Header />
-            <main className="container mx-auto py-6 min-h-[90vh]">
+            <main className="container mx-auto flex-1 py-6">
               {children}
             </main>
             <Footer />
