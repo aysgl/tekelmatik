@@ -10,6 +10,15 @@ export interface ShopHour {
 export interface ShopType {
     type: string;
 }
+
+export interface ShopArea {
+    administrative_area_level_1: string
+    administrative_area_level_2: string
+    administrative_area_level_4: string
+    compound_code: string
+    global_code: string
+}
+
 export interface Shop {
     id: number
     name: string
@@ -20,6 +29,7 @@ export interface Shop {
     closingTime: string
     rating: number
     formatted_phone_number: string
+    shop_area: ShopArea
     shop_hours: ShopHour[]
     shop_types: ShopType[]
     shop_photos: string[]
@@ -65,12 +75,9 @@ export const shopsApi = {
         }
     },
 
-    getByLocation: async ({ lat, lng }: { lat: number; lng: number }) => {
-        const { data } = await api.get<ShopsResponse>(
-            API_CONFIG.ENDPOINTS.LOCATION(`${lat},${lng}`)
-        )
-        console.log("getByLocation", data);
-        return data
+    getByLocation: async ({ latitude, longitude }: { latitude: number; longitude: number }) => {
+        const { data } = await api.get<ShopsResponse>(API_CONFIG.ENDPOINTS.LOCATION(latitude, longitude));
+        return data;
     }
 }
 

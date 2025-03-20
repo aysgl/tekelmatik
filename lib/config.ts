@@ -4,6 +4,6 @@ export const API_CONFIG = {
     SHOPS: '/shops',
     SEARCH: (query: string) => `/search?q=${encodeURIComponent(query)}`,
     AREA: (area: string) => `/search/${encodeURIComponent(area)}`,
-    LOCATION: (location: string) => `/search/nearby/${encodeURIComponent(location)}`
+    LOCATION: (lat: number, lng: number) => `/search/nearby/${lat},${lng}`
   }
 };

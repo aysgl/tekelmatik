@@ -54,7 +54,7 @@ export default function LeafletMap({ center, data }: LeafletMapProps) {
     });
 
     return (
-        <MapContainer className="h-[500px] w-full rounded -z-[0]" center={center} zoom={14} scrollWheelZoom={false}>
+        <MapContainer className="h-[500px] w-full rounded -z-[0]" center={center} zoom={15} scrollWheelZoom={false}>
             <TileLayer url="https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}" />
             {data.map((shop, i) => (
                 shop?.location_lat && shop?.location_lng &&

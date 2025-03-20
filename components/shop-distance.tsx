@@ -1,19 +1,23 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import { calculateDistance } from "@/lib/services/shops";
 import { useGeolocation } from "@/hooks/use-geolocation";
 
 export function ShopDistance({ shop }: { shop: { location_lat: number; location_lng: number } }) {
-    const { latitude, longitude, error } = useGeolocation();
+    const [distance, setDistance] = useState<string | null>("Konum alınıyor...");
+    const { latitude, longitude } = useGeolocation();
 
-    const distance = latitude && longitude
-        ? calculateDistance(shop.location_lat, shop.location_lng, latitude, longitude)
-        : null;
+    console.log("s", shop.location_lat, shop.location_lng);
+    console.log("l", latitude, longitude);
 
-    return (
-        <span className="text-xs">
-            {error ? "Konum alınamadı" : distance === null ? "Konum alınıyor..." : distance}
-        </span>
-    );
+    useEffect(() => {
+        if (latitude && longitude) {
+            console.log("Geolocation available:", latitude, longitude);
+            sessionStorage.setItem('userLocation', JSON.stringify({ lat: latitude, lng: longitude }));
+            setDistance(calculateDistance(shop.location_lat, shop.location_lng, latitude, longitude));
+        }
+    }, [latitude, longitude, shop]);
+
+    return distance;
 }

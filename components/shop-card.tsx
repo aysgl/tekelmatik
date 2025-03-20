@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { Card, CardContent } from "@/components/ui/card";
 import { isShopOpenNow, Shop } from '@/lib/services/shops';
 import Image from 'next/image';
-// import { AspectRatio } from './ui/aspect-ratio';
+import { AspectRatio } from './ui/aspect-ratio';
 import { Badge } from './ui/badge';
 import { MapPin, Navigation, Phone, Star } from 'lucide-react';
 import { ShopDistance } from './shop-distance';
@@ -21,7 +21,6 @@ const CarouselContent = dynamic(() => import('@/components/ui/carousel').then(mo
 const CarouselItem = dynamic(() => import('@/components/ui/carousel').then(mod => mod.CarouselItem))
 const CarouselNext = dynamic(() => import('@/components/ui/carousel').then(mod => mod.CarouselNext))
 const CarouselPrevious = dynamic(() => import('@/components/ui/carousel').then(mod => mod.CarouselPrevious))
-
 
 export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
     return (
@@ -66,11 +65,15 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
                             <Carousel opts={{
                                 align: "start",
                                 loop: true,
-                            }} className="w-full h-full">
+                            }} className="w-full h-full" aria-label={`${shop.name} fotoğraf galerisi`}
+                            >
                                 <CarouselContent>
                                     {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
-                                        <CarouselItem key={index}>
-                                            {/* <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
+                                        <CarouselItem key={index} role="group"
+                                            aria-roledescription="slide"
+                                            aria-label={`${index + 1} / ${shop.shop_photos.length}`}
+                                        >
+                                            <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
                                                 <Image
                                                     src={photo}
                                                     alt={`${shop.name} - Photo ${index + 1}`}
@@ -84,7 +87,7 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
                                                         height: '100%',
                                                     }}
                                                 />
-                                            </AspectRatio> */}
+                                            </AspectRatio>
                                         </CarouselItem>
                                     ))}
                                 </CarouselContent>
@@ -96,7 +99,7 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
                 </Suspense>
                 <div className='min-h-[90px]'>
                     <div className="flex items-center justify-between">
-                        <h3 className="font-medium">{shop.name}</h3>
+                        <p className="font-medium">{shop.name}</p>
                         <Badge
                             className={
                                 isShopOpenNow(shop.shop_hours)
@@ -119,10 +122,12 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
                                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                                 <span className="text-xs">{shop.rating}</span>
                             </div>
-                            <div className="flex items-center gap-1 text-sm">
-                                <Navigation className="h-3 w-3" />
-                                <ShopDistance shop={{ location_lat: shop.location_lat, location_lng: shop.location_lng }} />
-                            </div>
+                            {shop.location_lat && shop.location_lng &&
+                                <div className="flex items-center gap-1 text-sm">
+                                    <Navigation className="h-3 w-3" />
+                                    <ShopDistance shop={{ location_lat: shop.location_lat, location_lng: shop.location_lng }} />
+                                </div>
+                            }
                         </div>
                         {shop.formatted_phone_number && (
                             <Button asChild size="sm">

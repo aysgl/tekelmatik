@@ -38,7 +38,7 @@ export default function RootLayout({
           rel="preconnect"
           href="https://maps.googleapis.com"
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
       </head>
       <body className="flex min-h-screen flex-col">
         <ThemeProviderWrapper>
