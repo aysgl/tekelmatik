@@ -28,14 +28,9 @@ export function SearchBar({ onSearch, small }: SearchBarProps) {
     const handleLocation = async () => {
         setIsLocating(true)
         try {
-            await getPermission()
+            await getPermission();
         } catch (error) {
-            console.log({
-                title: "Hata",
-                description: "Konum alınamadı",
-                variant: "destructive",
-                error
-            })
+            console.log(error)
         } finally {
             setIsLocating(false)
         }

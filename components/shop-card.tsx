@@ -56,45 +56,47 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
                                 )}
                             </div>
                         </DialogTrigger>
-                        <DialogContent className="max-w-[100vw] md:max-w-[600px]">
-                            <DialogHeader>
-                                <DialogTitle className="text-lg font-semibold">
-                                    {shop.name}
-                                </DialogTitle>
-                            </DialogHeader>
-                            <Carousel opts={{
-                                align: "start",
-                                loop: true,
-                            }} className="w-full h-full" aria-label={`${shop.name} fotoğraf galerisi`}
-                            >
-                                <CarouselContent>
-                                    {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
-                                        <CarouselItem key={index} role="group"
-                                            aria-roledescription="slide"
-                                            aria-label={`${index + 1} / ${shop.shop_photos.length}`}
-                                        >
-                                            <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
-                                                <Image
-                                                    src={photo}
-                                                    alt={`${shop.name} - Photo ${index + 1}`}
-                                                    className="object-cover"
-                                                    width="600"
-                                                    height="600"
-                                                    loading="lazy"
-                                                    quality={75}
-                                                    style={{
-                                                        objectFit: 'cover',
-                                                        height: '100%',
-                                                    }}
-                                                />
-                                            </AspectRatio>
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-                                <CarouselPrevious className="md:-ms-4 ms-8" />
-                                <CarouselNext className="md:-me-4 me-8" />
-                            </Carousel>
-                        </DialogContent>
+                        {shop.main_photo_url &&
+                            <DialogContent className="max-w-[100vw] md:max-w-[600px]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-lg font-semibold">
+                                        {shop.name}
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <Carousel opts={{
+                                    align: "start",
+                                    loop: true,
+                                }} className="w-full h-full" aria-label={`${shop.name} fotoğraf galerisi`}
+                                >
+                                    <CarouselContent>
+                                        {shop.shop_photos?.length > 0 && shop.shop_photos?.map((photo, index) => (
+                                            <CarouselItem key={index} role="group"
+                                                aria-roledescription="slide"
+                                                aria-label={`${index + 1} / ${shop.shop_photos.length}`}
+                                            >
+                                                <AspectRatio ratio={1} className="w-full h-full bg-muted relative">
+                                                    <Image
+                                                        src={photo}
+                                                        alt={`${shop.name} - Photo ${index + 1}`}
+                                                        className="object-cover"
+                                                        width="600"
+                                                        height="600"
+                                                        loading="lazy"
+                                                        quality={75}
+                                                        style={{
+                                                            objectFit: 'cover',
+                                                            height: '100%',
+                                                        }}
+                                                    />
+                                                </AspectRatio>
+                                            </CarouselItem>
+                                        ))}
+                                    </CarouselContent>
+                                    <CarouselPrevious className="md:-ms-4 ms-8" />
+                                    <CarouselNext className="md:-me-4 me-8" />
+                                </Carousel>
+                            </DialogContent>
+                        }
                     </Dialog>
                 </Suspense>
                 <div className='min-h-[90px]'>

@@ -8,9 +8,6 @@ export function ShopDistance({ shop }: { shop: { location_lat: number; location_
     const [distance, setDistance] = useState<string | null>("Konum alınıyor...");
     const { latitude, longitude } = useGeolocation();
 
-    console.log("s", shop.location_lat, shop.location_lng);
-    console.log("l", latitude, longitude);
-
     useEffect(() => {
         if (latitude && longitude) {
             console.log("Geolocation available:", latitude, longitude);
