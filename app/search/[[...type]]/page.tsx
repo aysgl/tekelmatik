@@ -1,9 +1,8 @@
 "use client"
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { List, Map } from "lucide-react";
 import { useSearchParams, useParams } from "next/navigation";
 import { useInfiniteShops } from "@/hooks/use-shops";
 import { useInView } from 'react-intersection-observer'
@@ -19,10 +18,14 @@ const LeafletMap = dynamic(() => import('@/components/leafleft-map'), {
 
 const ShopCard = dynamic(() => import('@/components/shop-card').then((mod) => mod.ShopCard), {
     loading: () => <ShopCardSkeleton />,
-    ssr: false,
+    ssr: true,
 });
 
 const EmptyData = dynamic(() => import('@/components/empty-data').then(mod => mod.EmptyData), { ssr: false })
+
+const List = dynamic(() => import("lucide-react").then(mod => mod.List), { ssr: false });
+const Map = dynamic(() => import("lucide-react").then(mod => mod.Map), { ssr: false });
+
 
 export default function SearchPage() {
     const [viewMode, setViewMode] = useState<"list" | "map">("list")
@@ -110,19 +113,17 @@ export default function SearchPage() {
                             duration: 0.4,
                         }}
                     >
-                        <div className="grid gap-4">
+                        <div className="grid gap-4 min-h-40">
                             {isLoading ? (
                                 <ShopCardSkeleton />
                             ) : (
-                                shops?.pages.map((data, i) => (
-                                    <Fragment key={i}>{
-                                        data.data?.length > 0 ? data.data.map((shop) => (
-                                            <ShopCard key={shop.id} shop={shop} />
-                                        )) :
-                                            <EmptyData />
-                                    }
-                                    </Fragment>
-                                ))
+                                shops?.pages.map((data, i) =>
+                                    data.data?.length > 0 ? (
+                                        data.data.map((shop) => <ShopCard key={shop.id} shop={shop} />)
+                                    ) : (
+                                        <EmptyData key={i} />
+                                    )
+                                )
                             )}
                             <div ref={ref}>
                                 {isFetchingNextPage && <ShopCardSkeleton />}

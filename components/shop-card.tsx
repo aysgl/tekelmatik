@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { memo, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Card, CardContent } from "@/components/ui/card";
 import { isShopOpenNow, Shop } from '@/lib/services/shops';
@@ -8,7 +8,6 @@ import { Badge } from './ui/badge';
 import { MapPin, Navigation, Phone, Star } from 'lucide-react';
 import { ShopDistance } from './shop-distance';
 import { Button } from './ui/button';
-
 
 const Dialog = dynamic(() => import('@/components/ui/dialog').then(mod => mod.Dialog))
 const DialogContent = dynamic(() => import('@/components/ui/dialog').then(mod => mod.DialogContent))
@@ -22,7 +21,7 @@ const CarouselItem = dynamic(() => import('@/components/ui/carousel').then(mod =
 const CarouselNext = dynamic(() => import('@/components/ui/carousel').then(mod => mod.CarouselNext))
 const CarouselPrevious = dynamic(() => import('@/components/ui/carousel').then(mod => mod.CarouselPrevious))
 
-export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
+export const ShopCard = memo(({ shop, index = -1 }: { shop: Shop; index?: number }) => {
     return (
         <Card key={shop.id} className='min-h-[140px]'>
             <CardContent className="grid grid-cols-[auto_1fr] gap-4 items-start">
@@ -147,4 +146,6 @@ export function ShopCard({ shop, index = -1 }: { shop: Shop; index?: number }) {
             </CardContent>
         </Card>
     )
-}
+})
+
+ShopCard.displayName = "ShopCard";
